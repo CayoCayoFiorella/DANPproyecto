@@ -7,22 +7,6 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @State private var isLoggedIn = false
-    
-    var body: some View {
-        NavigationView {
-            if isLoggedIn {
-                // Mostrar la vista con la barra de navegación inferior (Home, Galerías, Mapa)
-                TabBarView(isLoggedIn: $isLoggedIn)
-            } else {
-                // Mostrar la pantalla de Login si no está logueado
-                LoginView(isLoggedIn: $isLoggedIn)
-            }
-        }
-    }
-}
-
 struct LoginView: View {
     @Binding var isLoggedIn: Bool
     @State private var username = ""
@@ -31,71 +15,85 @@ struct LoginView: View {
     @State private var showPassword = false
     
     var body: some View {
-        VStack {
-            Text("Login")
-                .font(.largeTitle)
-                .padding(.bottom, 40)
-            
-            TextField("Username", text: $username)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-                .padding(.horizontal)
-            
-            ZStack {
-                if showPassword {
-                    TextField("Password", text: $password)
+        ZStack {
+            Color(red: 0.47, green: 0.0, blue: 0.0078)
+                .edgesIgnoringSafeArea(.all)
+
+            VStack {
+                Text("UNSA")
+                    .font(.largeTitle)
+                    .foregroundColor(.white)
+                    .padding(.bottom, 20)
+                
+                // Añade aquí tu imagen
+                Image("Galerias_image")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 350, height: 350)
+                    .padding(.bottom, 30)
+                
+                TextField("Username", text: $username)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                    .padding(.horizontal)
+                
+                ZStack {
+                    if showPassword {
+                        TextField("Password", text: $password)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
+                            .padding(.horizontal)
+                    } else {
+                        SecureField("Password", text: $password)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
+                            .padding(.horizontal)
+                    }
+                    
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            showPassword.toggle()
+                        }) {
+                            Image(systemName: showPassword ? "eye.slash" : "eye")
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.trailing, 30)
+                    }
+                }
+                .padding(.bottom, 20)
+                
+                Button(action: {
+                    if username == "Admin" && password == "password" {
+                        isLoggedIn = true
+                    } else {
+                        loginFailed = true
+                    }
+                }) {
+                    Text("Login")
+                        .font(.headline)
+                        .foregroundColor(.white)
                         .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                        .padding(.horizontal)
-                } else {
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.black)
+                        .cornerRadius(10)
                         .padding(.horizontal)
                 }
                 
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        showPassword.toggle()
-                    }) {
-                        Image(systemName: showPassword ? "eye.slash" : "eye")
-                            .foregroundColor(.gray)
-                    }
-                    .padding(.trailing, 30)
+                if loginFailed {
+                    Text("Login failed. Try again.")
+                        .foregroundColor(.red)
+                        .padding(.top, 10)
                 }
             }
-            .padding(.bottom, 20)
-            
-            Button(action: {
-                if username == "Admin" && password == "password" {
-                    isLoggedIn = true
-                } else {
-                    loginFailed = true
-                }
-            }) {
-                Text("Login")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-            }
-            
-            if loginFailed {
-                Text("Login failed. Try again.")
-                    .foregroundColor(.red)
-                    .padding(.top, 10)
-            }
+            .padding()
         }
-        .padding()
     }
 }
+
 
 struct TabBarView: View {
     @Binding var isLoggedIn: Bool
