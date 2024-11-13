@@ -7,6 +7,22 @@
 
 import SwiftUI
 
+struct ContentView: View {
+    @State private var isLoggedIn = false
+    
+    var body: some View {
+        NavigationView {
+            if isLoggedIn {
+                // Mostrar la vista con la barra de navegación inferior (Home, Galerías, Mapa)
+                TabBarView(isLoggedIn: $isLoggedIn)
+            } else {
+                // Mostrar la pantalla de Login si no está logueado
+                LoginView(isLoggedIn: $isLoggedIn)
+            }
+        }
+    }
+}
+
 struct LoginView: View {
     @Binding var isLoggedIn: Bool
     @State private var username = ""
