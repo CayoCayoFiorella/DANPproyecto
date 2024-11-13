@@ -9,15 +9,18 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var isLoggedIn = false
+    @State private var isRegistering = false
     
     var body: some View {
         NavigationView {
             if isLoggedIn {
                 // Mostrar la vista con la barra de navegación inferior (Home, Galerías, Mapa)
                 TabBarView(isLoggedIn: $isLoggedIn)
+            } else if isRegistering {
+                RegisterView(isLoggedIn: $isLoggedIn)
             } else {
                 // Mostrar la pantalla de Login si no está logueado
-                LoginView(isLoggedIn: $isLoggedIn)
+                LoginView(isLoggedIn: $isLoggedIn, isRegistering: $isRegistering)
             }
         }
     }
@@ -25,91 +28,103 @@ struct ContentView: View {
 
 struct LoginView: View {
     @Binding var isLoggedIn: Bool
+    @Binding var isRegistering: Bool
     @State private var username = ""
     @State private var password = ""
     @State private var loginFailed = false
-    @State private var showPassword = false
     
     var body: some View {
         ZStack {
+            // Fondo de color similar a #780002
             Color(red: 0.47, green: 0.0, blue: 0.0078)
                 .edgesIgnoringSafeArea(.all)
-
+            
             VStack {
+                Spacer(minLength: 50) // Espacio adicional en la parte superior
+                
+                // Título "UNSA"
                 Text("UNSA")
-                    .font(.largeTitle)
+                    .font(.system(size: 34, weight: .bold)) // Usando font con tamaño y peso
                     .foregroundColor(.white)
-                    .padding(.bottom, 20)
-                
-                // Añade aquí tu imagen
-                Image("Galerias_image")
+                    .padding(.top, 20)
+
+                // Imagen entre el título y el formulario
+                Image("Galerias_image") // Reemplaza con el nombre de tu imagen en Assets
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 350, height: 350)
-                    .padding(.bottom, 30)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 200)
+                    .clipped()
                 
-                TextField("Username", text: $username)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .padding(.horizontal)
-                
-                ZStack {
-                    if showPassword {
-                        TextField("Password", text: $password)
+                VStack(alignment: .leading, spacing: 8) {
+                    // Subtítulo e indicaciones
+                    Text("Inicio de Sesión")
+                        .font(.system(size: 24, weight: .bold)) // Usando font con tamaño y peso
+                        .foregroundColor(.white)
+                    
+                    Text("Inicia sesión con tu Usuario y Contraseña")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.7))
+                    
+                    // Campo de texto para el email
+                    TextField("Email", text: $username)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .padding(.horizontal)
+                    
+                    // Campo de texto para la contraseña
+                    SecureField("Contraseña", text: $password)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .padding(.horizontal)
+                    
+                    // Botón de inicio de sesión
+                    Button(action: {
+                        if username == "Admin" && password == "password" {
+                            isLoggedIn = true
+                        } else {
+                            loginFailed = true
+                        }
+                    }) {
+                        Text("Iniciar Sesión")
+                            .font(.headline)
+                            .foregroundColor(.white)
                             .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(8)
-                            .padding(.horizontal)
-                    } else {
-                        SecureField("Password", text: $password)
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(8)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.black)
+                            .cornerRadius(10)
                             .padding(.horizontal)
                     }
                     
+                    // Mensaje de error
+                    if loginFailed {
+                        Text("Inicio de sesión fallido. Inténtalo de nuevo.")
+                            .foregroundColor(.red)
+                            .padding(.top, 10)
+                    }
+                    
+                    // Texto de registro
                     HStack {
                         Spacer()
-                        Button(action: {
-                            showPassword.toggle()
-                        }) {
-                            Image(systemName: showPassword ? "eye.slash" : "eye")
-                                .foregroundColor(.gray)
+                        Text("¿No tienes cuenta?")
+                            .foregroundColor(.white)
+                        Button("Regístrate") {
+                            isRegistering = true
                         }
-                        .padding(.trailing, 30)
-                    }
-                }
-                .padding(.bottom, 20)
-                
-                Button(action: {
-                    if username == "Admin" && password == "password" {
-                        isLoggedIn = true
-                    } else {
-                        loginFailed = true
-                    }
-                }) {
-                    Text("Login")
-                        .font(.headline)
                         .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.black)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
+                        .font(.system(size: 16, weight: .bold)) // Aplicando tamaño y peso de fuente
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 10)
                 }
+                .padding()
                 
-                if loginFailed {
-                    Text("Login failed. Try again.")
-                        .foregroundColor(.red)
-                        .padding(.top, 10)
-                }
+                Spacer() // Esto asegura que el contenido no se quede pegado a la parte inferior
             }
-            .padding()
         }
     }
 }
-
 
 struct TabBarView: View {
     @Binding var isLoggedIn: Bool
